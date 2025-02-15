@@ -49,6 +49,7 @@ router.post("/login", async (req: Request, res: Response):Promise<any> => {
     }
 })
 
+// middleware
 export const verifyToken = (
     req: Request,
     res: Response,
@@ -56,7 +57,13 @@ export const verifyToken = (
 ) => {
     const authHeader = req.headers.authorization;
     if (authHeader) {
+        jwt.verify(authHeader, "secret", (err) => {
+            if (err) {
+                return res.sendStatus(403);
+            }
 
+            next();
+        })
     }
     res.sendStatus(401);
 }
