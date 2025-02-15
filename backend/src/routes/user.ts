@@ -1,7 +1,7 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
-import { UserModel } from "../models/user";
+import { IUser, UserModel } from "../models/user";
 import { UserErrors } from "../errors";
 
 const router = Router();
@@ -29,7 +29,7 @@ router.post("/register", async (req: Request, res: Response):Promise<any> => {
 router.post("/login", async (req: Request, res: Response):Promise<any> => {
     const { username, password } = req.body;
     try {
-        const user = await UserModel.findOne({ username });
+        const user : IUser = await UserModel.findOne({ username });
 
         if (!user) {
             return res.status(400).json({ type: UserErrors.NO_USER_FOUND})
@@ -48,6 +48,18 @@ router.post("/login", async (req: Request, res: Response):Promise<any> => {
         res.status(500).json({ type: err});
     }
 })
+
+export const verifyToken = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+
+    }
+    res.sendStatus(401);
+}
 
 
 export { router as userRouter };
