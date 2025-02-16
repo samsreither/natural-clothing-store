@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 
 export const Navbar = () => {
+
+
     return <div>
         <div className="navbar-title">
             <h1> Natural Clothing Store </h1>
