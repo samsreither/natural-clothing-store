@@ -18,6 +18,8 @@ export const Product = (props: Props) => {
                 <p>{price}</p>
             </div>
 
+            <div className="addToCartBtn" onClick={() => addToCart(_id)}> Add To Cart </div>
+
             <div className="stock-quantity">
                 {stockQuantity}
             </div>

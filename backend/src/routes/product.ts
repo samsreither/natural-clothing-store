@@ -22,7 +22,7 @@ router.get("/", verifyToken, async (_, res: Response) => {
 router.post(
   "/checkout",
   verifyToken,
-  async (req: Request, res: Response):Promise<void> => {
+  async (req: Request, res: Response) => {
     // id and cart items come in with request
     const { customerID, cartItems } = req.body;
 
@@ -38,8 +38,7 @@ router.post(
       }
       // if lengths dont equal, return 400 error
       if (products.length !== productIDs.length) {
-        res.status(400).json({ type: ProductErrors.NO_PRODUCT_FOUND });
-        return;
+        return res.status(400).json({ type: ProductErrors.NO_PRODUCT_FOUND });
       }
       let totalPrice = 0;
       for (const item in cartItems) {
@@ -48,8 +47,7 @@ router.post(
         );
 
         if (!product) {
-          res.status(400).json({ type: ProductErrors.NO_PRODUCT_FOUND });
-          return;
+          return res.status(400).json({ type: ProductErrors.NO_PRODUCT_FOUND });
         }
 
         if (product.stockQuantity < cartItems[item]) {
@@ -60,8 +58,7 @@ router.post(
         totalPrice += product.price * cartItems[item];
 
         if (user.availableMoney < totalPrice) {
-          res.status(400).json({ type: ProductErrors.NO_AVAILABLE_MONEY });
-          return;
+          return res.status(400).json({ type: ProductErrors.NO_AVAILABLE_MONEY });
         }
 
         user.availableMoney -= totalPrice;
@@ -75,7 +72,7 @@ router.post(
       }
       res.json({ purchasedItems: user.purchasedItems });
     } catch (err) {
-      res.status(400).json({ err });
+      console.log(err);
     }
   }
 );

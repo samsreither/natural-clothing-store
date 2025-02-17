@@ -23,5 +23,5 @@ export const useGetProducts = () => {
         fetchProducts();
     }, []);
 
-    return { products }
+    return { products, fetchProducts }
 }

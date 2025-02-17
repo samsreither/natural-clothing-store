@@ -56,18 +56,14 @@ export const verifyToken = (
   next: NextFunction
 ) => {
   const authHeader = req.headers.authorization;
-  console.log('auth header', authHeader);
   if (authHeader) {
     jwt.verify(authHeader, "secret", (err) => {
       if (err) {
-        console.log('token verification failed', err)
         return res.sendStatus(403);
       }
-      console.log('token verified successfully')
       next();
     });
   } else {
-    console.log('no auth header provided')
     res.sendStatus(401);
   }
 };
