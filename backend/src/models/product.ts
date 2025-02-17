@@ -29,6 +29,7 @@ const ProductSchema = new Schema<IProduct>(
         stockQuantity: {
             type: Number,
             required: true,
+            min: [0, "Stock can't be lower than 0."]
         }
     }
 )
