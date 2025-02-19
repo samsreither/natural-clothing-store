@@ -7,10 +7,11 @@ import axios from "axios";
 import { IProduct } from "../models/interfaces";
 
 
-export interace IShopContext {
+export interface IShopContext {
     addToCart: (itemID: string) => void;
     removeFromCart: (itemID: string) => void;
     updateCartItemCount: (newAmount: number, itemId: string) => void;
+    getCartItemCount: (itemId: string) => number;
     getTotalCartAmount: () => number;
     checkout: () => void;
     availableMoney: number;
@@ -18,6 +19,19 @@ export interace IShopContext {
     isAuthenticated: boolean;
     setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
+
+const defaultVal: IShopContext = {
+    addToCart: () => null,
+    removeFromCart: () => null,
+    updateCartItemCount: () => null,
+    getCartItemCount: () => 0,
+    getTotalCartAmount: () => 0,
+    checkout: () => null,
+    availableMoney: 0,
+    purchasedItems: [],
+    isAuthenticated: false,
+    setIsAuthenticated: () => null,
+  };
 
 export const ShopContext = createContext<IShopContext>(defaultVal);
 
@@ -65,7 +79,8 @@ export const ShopContextProvider = (props) => {
             setCartItems((prev) => ({...prev, [itemId]:1 }))
         }
         else {
-            setCartItems((prev) => ({...prev, [itemId]: prev[itemId] + 1}))
+            setCartItems((prev) => ({...prev, [itemId]: prev[itemId] + 1}));
+            console.log('trying to add to cart')
         }
     }
 
@@ -97,15 +112,15 @@ export const ShopContextProvider = (props) => {
     const checkout = async () => {
         const body = { customerID: localStorage.getItem("userID"), cartItems}
         try {
-            await axios.post("http://localhost:3001/products/checkout", body, headers)
-        }
+            await axios.post("http://localhost:3001/products/checkout", body, { headers })
+        
         setCartItems({});
         fetchAvailableMoney();
         fetchPurchasedItems();
         navigate("/");
     } catch (err) {
         console.log(err);
-    }
+    }}
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -134,5 +149,4 @@ export const ShopContextProvider = (props) => {
         <ShopContext.Provider value={contextValue}>
             {props.children}
         </ShopContext.Provider>
-    )
-}
+    )}
