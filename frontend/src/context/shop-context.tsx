@@ -33,48 +33,105 @@ export const ShopContextProvider = (props) => {
     const { headers } = useGetToken();
     const navigate = useNavigate();
 
-    const fetchAvailableMoney = () => {
+    const fetchAvailableMoney = async () => {
         try {
-
+            const res = await axios.get(`http://localhost:3001/user/available-money/${localStorage.getItem("userID")}`, { headers });
+            setAvailableMoney(res.data.availableMoney);
         } catch (err) {
-
+            alert ("ERROR: Something went wrong.")
         }
     }
 
-    const fetchPurchasedItems = () => {
+    const fetchPurchasedItems = async () => {
         try {
-
+            const res = await axios.get(`http://localhost:3001/products/purchased-items${localStorage.getItem("userID")}`, { headers });
+            setPurchasedItems(res.data.purchasedItems);
         } catch (err) {
-
+            alert ("ERROR: Something went wrong")
         }
     }
 
-    const getCartItemCount = () => {
+    // get the amount of an item in the cart
+    const getCartItemCount = (itemId: string): number => {
+        if (itemId in cartItems) {
+            return cartItems[itemId];
+        }
 
+        return 0;
     }
 
-    const addToCart = () => {
-
+    const addToCart = (itemId: string) => {
+        if (!cartItems[itemId]) {
+            setCartItems((prev) => ({...prev, [itemId]:1 }))
+        }
+        else {
+            setCartItems((prev) => ({...prev, [itemId]: prev[itemId] + 1}))
+        }
     }
 
-    const removeFromCart = () => {
-
+    const removeFromCart = (itemId: string) => {
+        if (!cartItems[itemId]) return;
+        if (cartItems[itemId] == 0) return;
+        setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1}))
     }
 
-    const updateCartItemCount = () => {
-
+    const updateCartItemCount = (newAmount: number, itemId: string) => {
+        if (newAmount < 0) return;
+        setCartItems((prev) => ({...prev, [itemId]: newAmount}));
     }
 
-    const getTotalCartAmount = () => {
+    const getTotalCartAmount = ():number => {
+        let totalAmount = 0;
+        for (const item in cartItems) {
+            if (cartItems[item] > 0) {
+                let itemInfo: IProduct = products.find(
+                    (product) => product._id === item
+                );
 
+                totalAmount += cartItems[item] * itemInfo.price;
+            }
+        }
+        return totalAmount;
     }
 
-    const checkout = () => {
-
+    const checkout = async () => {
+        const body = { customerID: localStorage.getItem("userID"), cartItems}
+        try {
+            await axios.post("http://localhost:3001/products/checkout", body, headers)
+        }
+        setCartItems({});
+        fetchAvailableMoney();
+        fetchPurchasedItems();
+        navigate("/");
+    } catch (err) {
+        console.log(err);
     }
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            localStorage.clear();
+            setCookies("access_token", null);
+        }
+    }, [isAuthenticated])
+
+    // pass all these values to children
+    const contextValue: IShopContext = {
+        addToCart,
+        removeFromCart,
+        updateCartItemCount,
+        getCartItemCount,
+        getTotalCartAmount,
+        checkout,
+        availableMoney,
+        purchasedItems,
+        isAuthenticated,
+        setIsAuthenticated,
+      };
+
+
 
     return (
-        <ShopContext.Provider>
+        <ShopContext.Provider value={contextValue}>
             {props.children}
         </ShopContext.Provider>
     )
