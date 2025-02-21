@@ -110,16 +110,15 @@ export const ShopContextProvider = (props) => {
     }
 
     const checkout = async () => {
+        
         const body = { customerID: localStorage.getItem("userID"), cartItems}
         try {
             await axios.post("http://localhost:3001/products/checkout", body, { headers })
         
         setCartItems({});
-        fetchAvailableMoney();
-        fetchPurchasedItems();
-        navigate("/");
+        
     } catch (err) {
-        console.log(err);
+        console.log(err, 'error from checkout function');
     }}
 
     useEffect(() => {
